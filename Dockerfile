@@ -26,7 +26,13 @@
 # the JupyterHub wheel on the native architecture only
 # https://www.docker.com/blog/faster-multi-platform-builds-dockerfile-cross-compilation-guide/
 
-ARG BASE_IMAGE=ubuntu:22.04
+ARG BASE_REGISTRY=201959883603.dkr.ecr.us-east-2.amazonaws.com
+ARG BASE_IMAGE_PATH=mdaca/base-images/ironbank-ubuntu
+ARG BASE_TAG=22.04_stable
+ARG BASE_IMAGE=${BASE_REGISTRY}/${BASE_IMAGE_PATH}:${BASE_TAG}
+ARG $BASE_IMAGE
+
+#ARG BASE_IMAGE=ubuntu:22.04
 
 
 ######################################################################
@@ -94,7 +100,7 @@ RUN apt-get update -qq \
     python3-pip \
     python3-pycurl \
     python3-venv \
- && python3 -m pip install --no-cache-dir --upgrade setuptools pip build wheel
+ && python3 -m pip install --no-cache-dir --upgrade setuptools pip build wheel 
 
 WORKDIR /src/jupyterhub
 
@@ -141,6 +147,6 @@ RUN apt-get update -qq \
 RUN --mount=type=cache,from=wheel-builder,source=/src/jupyterhub/wheelhouse,target=/tmp/wheelhouse \
     # always make sure pip is up to date!
     python3 -m pip install --no-compile --no-cache-dir --upgrade setuptools pip \
- && python3 -m pip install --no-compile --no-cache-dir /tmp/wheelhouse/*
+ && python3 -m pip install --no-compile --no-cache-dir /tmp/wheelhouse/* kubernetes_asyncio
 
 CMD ["jupyterhub"]
